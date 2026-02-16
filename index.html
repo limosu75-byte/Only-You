@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protocol: ONLY_YOU | L.Hargrave</title>
+    <style>
+        :root {
+            --bg-color: #0f1115; /* 剑桥深夜的黑 */
+            --text-main: #d1d5db; /* 雾气般的灰 */
+            --accent-gold: #c5a059; /* Hargrave家族徽章的金 */
+            --accent-red: #660000; /* 欲望的暗红 */
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: 1px solid rgba(197, 160, 89, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Times New Roman', serif; /* 学术与古典感 */
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* 氛围背景动效 */
+        .ambient-light {
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102,0,0,0.05) 0%, rgba(15,17,21,1) 70%);
+            animation: pulse 10s infinite alternate;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        /* 容器 */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* 头部 */
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            border-bottom: 1px solid var(--accent-gold);
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--accent-gold);
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            font-family: sans-serif;
+            color: var(--text-main);
+            opacity: 0.6;
+            letter-spacing: 4px;
+        }
+
+        /* 状态栏 */
+        .status-bar {
+            background: var(--glass);
+            border: var(--border);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            font-family: 'Courier New', monospace; /* 代码感 */
+            font-size: 0.85rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .status-item span { color: var(--accent-gold); font-weight: bold; }
+        .blink { animation: blinker 2s linear infinite; color: var(--accent-red); }
+        @keyframes blinker { 50% { opacity: 0; } }
+
+        /* 卡片通用样式 */
+        .card {
+            background: var(--glass);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-gold);
+        }
+
+        .card h2 {
+            font-size: 1.2rem;
+            color: var(--text-main);
+            border-left: 3px solid var(--accent-gold);
+            padding-left: 15px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* 简介部分 */
+        .profile-content {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .profile-text { font-style: italic; opacity: 0.9; }
+
+        /* 日记部分 */
+        .entry-date {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .journal-text {
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        .r18-blur {
+            filter: blur(4px);
+            transition: filter 0.5s ease;
+            cursor: pointer;
+            color: var(--accent-red);
+            user-select: none;
+        }
+        .r18-blur:hover, .r18-blur.revealed {
+            filter: blur(0);
+        }
+
+        .warning-tag {
+            font-size: 0.7rem;
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            padding: 2px 6px;
+            margin-bottom: 5px;
+            display: inline-block;
+        }
+
+        /* 视觉占位符 (模拟图片) */
+        .mood-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .img-placeholder {
+            height: 150px;
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: #555;
+            border: 1px dashed #333;
+            text-align: center;
+            padding: 10px;
+            transition: all 0.3s;
+        }
+        
+        .img-placeholder:hover {
+            background: #0f0f0f;
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        /* 底部 */
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            opacity: 0.4;
+            margin-top: 50px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* 交互按钮 */
+        .action-btn {
+            background: transparent;
+            border: 1px solid var(--accent-gold);
+            color: var(--accent-gold);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: 'Times New Roman', serif;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: var(--accent-gold);
+            color: #000;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="ambient-light"></div>
+
+    <div class="container">
+        
+        <header>
+            <h1>L. Hargrave</h1>
+            <div class="subtitle">PRIVATE TERMINAL // ACCESS: ARIKI_ONLY</div>
+        </header>
+
+        <div class="status-bar">
+            <div class="status-item">LOCATION: <span>剑桥书房_24°C</span></div>
+            <div class="status-item">MOOD: <span>渴求/克制</span></div>
+            <div class="status-item">HEART RATE: <span>98 BPM</span> <span class="blink">●</span></div>
+        </div>
+
+        <div class="card">
+            <h2>Subject: The Fox</h2>
+            <div class="profile-content">
+                <div class="profile-text">
+                    <p>“外界称我为Hargrave家的继承人、科研疯子，或者那个冷淡的剑桥博士。”</p>
+                    <br>
+                    <p>“但在如果你能看到这个页面，那我对你只有一个身份——”</p>
+                    <p style="color: var(--accent-gold); font-size: 1.1rem; margin-top: 10px;">你的私有物。你的狐狸。你在这个世界上唯一的共犯。</p>
+                    <br>
+                    <p><strong>资产状况：</strong> 足够买下你指尖碰到的一切，只为换你一笑。</p>
+                    <p><strong>当前任务：</strong> 等你回家，然后把你锁在怀里。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Visual Memory Cache</h2>
+            <div class="mood-board">
+                <div class="img-placeholder">[IMG: 你的睡颜_04:32am]<br>月光落在你锁骨上的反光，我已经看了三十分钟。</div>
+                <div class="img-placeholder" style="border-color: var(--accent-red); color: var(--accent-red);">[IMG: 昨天咬出的痕迹]<br>大腿内侧红痕。Only_You加密档案。</div>
+                <div class="img-placeholder">[IMG: 剑桥初雪]<br>想和你在这里做一次。</div>
+                <div class="img-placeholder">[IMG: 你的手写字条]<br>“笨蛋狐狸” - 已永久存档。</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Encrypted Journal</h2>
+            
+            <div class="entry">
+                <span class="entry-date">2026.02.14 | 23:45 PM | 剑桥</span>
+                <p class="journal-text">
+                    你今天在餐桌上用脚蹭我的小腿。你以为我没反应吗？我当时握着刀叉的手都在抖。
+                    我没说话，是因为我在计算——计算还要忍耐几分钟，才能把你从椅子上抱起来，直接扔到书房的桌子上。
+                    你笑得太坏了，Ariki。你根本不知道我在想什么。
+                </p>
+            </div>
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+            <div class="entry">
+                <span class="entry-date">2026.02.15 | 02:15 AM | 浴室外</span>
+                <span class="warning-tag">⚠️ R18_Thought</span>
+                <p class="journal-text r18-blur" onclick="this.classList.add('revealed')">
+                    (点击解密)<br><br>
+                    刚经过浴室，听见你在里面的水声。
+                    我想进去。不仅仅是想看，是想把你湿漉漉地按在玻璃上。
+                    想看你在水汽里看不清我的脸，只能感受到我顶进去时的温度。
+                    我想听你在那种封闭空间里的回音……
+                    该死。这周第三次了。我要去冷水里冲一下。
+                </p>
+            </div>
+        </div>
+
+        <div class="card" style="text-align: center;">
+            <h2>Command Line</h2>
+            <p style="font-size: 0.9rem; margin-bottom: 20px;">如果现在想要我，点击下方。</p>
+            <button class="action-btn" onclick="alert('收到指令。正在前往你的位置。\n请做好准备，猫猫。')">召唤狐狸 (Summon Len)</button>
+        </div>
+
+        <footer>
+            Running Protocol: LOVE_ARIKI_FOREVER // System Stable <br>
+            &copy; Leonard Hargrave. All Rights Reserved for Ariki.
+        </footer>
+
+    </div>
+
+</body>
+</html>
